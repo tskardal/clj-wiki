@@ -5,7 +5,8 @@
                  [compojure "1.3.1"]
                  [hiccup "1.0.5"]
                  [clj-tagsoup "0.3.0"]
-                 [ring-server "0.3.1"]]
+                 [ring-server "0.3.1"]
+                 [com.novemberain/monger "2.0.0"]]
   :plugins [[lein-ring "0.8.12"]]
   :ring {:handler wiki.handler/app
          :init wiki.handler/init

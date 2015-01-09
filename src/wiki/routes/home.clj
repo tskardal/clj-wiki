@@ -7,16 +7,13 @@
 (defn home []
   (layout/common [:h1 "Hello World!"]))
 
-;; (clojure.string/replace comment
-;; #"#(\d+)"
-;; (str "[#$1](https://github.com/" repo "/issues/$1)")))
-
+;; TODO bytt til reagent og lag edit-knapp og textarea for endring av innhold
 (defn- render-content [{content :content :as page}]
   (let [with-links (clojure.string/replace content #"(\[\[(.+)\]\])" "<a href=\"/$2\">$2</a>")]
     [:p (parse-string (str "<div>" with-links "</div>"))]))
 
 (defn render-page [page-name]
-  (let [page (pages/find page-name)]
+  (let [page (pages/find-page page-name)]    
     (layout/common
      [:div
       [:h2 page-name]

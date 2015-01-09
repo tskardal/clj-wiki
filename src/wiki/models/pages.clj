@@ -1,13 +1,25 @@
-(ns wiki.models.pages)
+(ns wiki.models.pages
+  (:require [monger.core :as mg]
+            [monger.collection :as mc])
+  (:import [org.bson.types ObjectId]))
 
-;; TODO: persist
-(def pages (atom {}))
+(defn persist [page]
+  (let [conn (mg/connect)
+        db (mg/get-db conn "wikidb")]
+    (mc/insert db "pages" (merge {:_id (ObjectId.)} page))))
 
-(defn- create-page [name]  
-  (let [page {:id name :content "This page does not exist!"}]
-    (swap! pages assoc (keyword name) page)))
+(defn- lookup [name]
+  (let [conn (mg/connect)
+        db (mg/get-db conn "wikidb")]
+    (mc/find-maps db "pages" {:name name})))
 
-(defn find [name]
-  (if-let [page (@pages (keyword name))]
-    page
-    ((create-page name) (keyword name))))
+(defn- create-page [name]
+  (let [page {:name name :content "This page does not exist! [[Test]]"}]
+    (persist page)
+    page))
+
+(defn find-page [name]
+  (let [page (lookup name)]
+    (if (empty? (seq page))        
+      (create-page name)
+      page)))
