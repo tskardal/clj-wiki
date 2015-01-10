@@ -1,13 +1,15 @@
 (ns wiki.models.pages
   (:require [monger.core :as mg]
             [monger.collection :as mc]
-            [monger.operators :refer [$set]])
+            [monger.operators :refer [$set]]
+            [wiki.search.elastic :refer [store-index]])
   (:import [org.bson.types ObjectId]))
 
 (defn persist [page]
   (let [conn (mg/connect)
         db (mg/get-db conn "wikidb")]
-    (mc/update db "pages" {:name (:name page)} {$set page} {:upsert true})))
+    (mc/update db "pages" {:name (:name page)} {$set page} {:upsert true})
+    (store-index page)))
 
 (defn- lookup [name]
   (let [conn (mg/connect)

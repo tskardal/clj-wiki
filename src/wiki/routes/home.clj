@@ -40,7 +40,7 @@
   (redirect (str "/" page)))
 
 (defroutes home-routes
-  (GET "/" [] (home))
+  (GET "/" [] (render-page "Welcome to this wiki"))
   (GET "/edit/:page" [page] (edit-page page))
   (POST "/edit/:page" {{:keys [page content]} :params} (save-page page content))
   (GET "/:page" [page] (render-page page)))
