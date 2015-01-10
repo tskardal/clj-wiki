@@ -1,5 +1,7 @@
 (ns wiki.routes.home
   (:require [compojure.core :refer :all]
+            [ring.util.response :refer [redirect]]
+            [hiccup.form :refer [form-to]]
             [wiki.views.layout :as layout]
             [wiki.models.pages :as pages]
             [pl.danieljanus.tagsoup :refer [parse-string]]))
@@ -17,8 +19,26 @@
     (layout/common
      [:div
       [:h2 page-name]
+      [:a {:href (str "/edit/" page-name)} "Edit"]
       (render-content page)])))
+
+(defn edit-page [page-name]
+  (let [page (pages/find-page page-name)]
+    (println "type: " (type  page))
+    (layout/common
+     [:div
+      [:h2 "Edit page"]
+      [:h3 page-name]
+      (form-to [:post ""]
+               [:textarea {:name "content" :cols 80 :rows 40} (:content page)]
+               [:input {:type "submit" :value "Hoist"}])])))
+
+(defn save-page [page content]
+  (pages/save page content)
+  (redirect (str "/" page)))
 
 (defroutes home-routes
   (GET "/" [] (home))
+  (GET "/edit/:page" [page] (edit-page page))
+  (POST "/edit/:page" {{:keys [page content]} :params} (save-page page content))
   (GET "/:page" [page] (render-page page)))
