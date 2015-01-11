@@ -5,12 +5,12 @@
             [markdown.core :refer [md-to-html-string]]
             [wiki.views.layout :as layout]
             [wiki.models.pages :as pages]
+            [wiki.search.elastic :as es]
             [pl.danieljanus.tagsoup :refer [parse-string]]))
 
 (defn home []
   (layout/common [:h1 "Hello World!"]))
 
-;; TODO bytt til reagent og lag edit-knapp og textarea for endring av innhold
 (defn- render-content [{content :content :as page}]
   (let [with-links (clojure.string/replace content #"(\[\[(.+)\]\])" "<a href=\"/$2\">$2</a>")
         md (md-to-html-string with-links)]
@@ -26,7 +26,6 @@
 
 (defn edit-page [page-name]
   (let [page (pages/find-page page-name)]
-    (println "type: " (type  page))
     (layout/common
      [:div
       [:h2 "Edit page"]
@@ -39,8 +38,20 @@
   (pages/save page content)
   (redirect (str "/" page)))
 
+(defn search-for [q]
+  (let [res  (es/search q)]
+    (layout/common
+     [:h3 "Search results"]
+     [:ul (for [x res]
+            (let [name (-> x :_source :name)
+                  content (-> x :highlight :content first)]
+              [:li
+               [:a {:href (str "/" name)} [:h3 name]]
+               [:p content]]))])))
+
 (defroutes home-routes
   (GET "/" [] (render-page "Welcome to this wiki"))
+  (GET "/search" {{q :q} :params} (search-for q))
   (GET "/edit/:page" [page] (edit-page page))
   (POST "/edit/:page" {{:keys [page content]} :params} (save-page page content))
   (GET "/:page" [page] (render-page page)))
