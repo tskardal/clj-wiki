@@ -12,7 +12,7 @@
   (layout/common [:h1 "Hello World!"]))
 
 (defn- render-content [{content :content :as page}]
-  (let [with-links (clojure.string/replace content #"(\[\[(.+)\]\])" "<a href=\"/$2\">$2</a>")
+  (let [with-links (clojure.string/replace content #"(\[\[(.*?)\]\])" "<a href=\"/$2\">$2</a>")
         md (md-to-html-string with-links)]
     [:p (parse-string (str "<div>" md "</div>"))]))
 
@@ -47,7 +47,7 @@
                   content (-> x :highlight :content first)]
               [:li
                [:a {:href (str "/" name)} [:h3 name]]
-               [:p content]]))])))
+               [:p (render-content {:content content})]]))])))
 
 (defroutes home-routes
   (GET "/" [] (render-page "Welcome to this wiki"))
