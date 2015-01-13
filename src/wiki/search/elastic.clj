@@ -8,7 +8,7 @@
 
 (defn store-index [page]
   (let [conn (esr/connect "http://localhost:9200")]    
-    (esd/create conn "myapp1_development" "page" page)))
+    (esd/put conn "myapp1_development" "page" (:_id page) page)))
 
 (defn search [query]
   (let [conn (esr/connect "http://127.0.0.1:9200")
@@ -24,5 +24,6 @@
     hits))
 
 (defn setup []
-  (let [conn (esr/connect "http://localhost:9200")]
-    (esi/create conn "myapp1_development")))
+  (let [conn (esr/connect "http://localhost:9200")
+        mapping-types {"page" {:properties {:_id {:store true :index "not_analyzed"}}}}]
+    (esi/create conn "myapp1_development" :mappings mapping-types)))
