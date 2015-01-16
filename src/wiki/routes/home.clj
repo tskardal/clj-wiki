@@ -20,7 +20,7 @@
   (let [page (pages/find-page page-name)]    
     (layout/common
      [:div
-      [:h2 page-name]
+      [:h1 {:class "page-header"} page-name]
       [:a {:href (str "/edit/" page-name)} "Edit"]
       (render-content page)])))
 
