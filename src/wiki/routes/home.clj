@@ -39,15 +39,16 @@
   (redirect (str "/" page)))
 
 (defn search-for [q]
-  (let [res  (es/search q)]
-    (layout/common
-     [:h3 "Search results"]
+  (layout/common
+   [:h3 "Search results"]
+   (if-let [res  (seq (es/search q))]
      [:ul (for [x res]
             (let [name (-> x :_source :name)
                   content (-> x :highlight :content first)]
               [:li
                [:a {:href (str "/" name)} [:h3 name]]
-               [:p (render-content {:content content})]]))])))
+               [:p (render-content {:content content})]]))]
+     [:p "No results. You could " [:a {:href (str "/edit/" q)} " create it "] " :-)"])))
 
 (defroutes home-routes
   (GET "/" [] (render-page "Welcome to this wiki"))
