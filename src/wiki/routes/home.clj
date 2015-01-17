@@ -6,15 +6,16 @@
             [wiki.views.layout :as layout]
             [wiki.models.pages :as pages]
             [wiki.search.elastic :as es]
-            [pl.danieljanus.tagsoup :refer [parse-string]]))
+            [hickory.core :refer [parse-fragment as-hiccup]]))
 
 (defn home []
   (layout/common [:h1 "Hello World!"]))
 
 (defn- render-content [{content :content :as page}]
   (let [with-links (clojure.string/replace content #"(\[\[(.*?)\]\])" "<a href=\"/$2\">$2</a>")
-        md (md-to-html-string with-links)]
-    [:p (parse-string (str "<div>" md "</div>"))]))
+        md (md-to-html-string with-links)
+        frag (parse-fragment (str "<div>" md "</div>"))]
+    [:p (map as-hiccup frag)]))
 
 (defn render-page [page-name]
   (let [page (pages/find-page page-name)]    
