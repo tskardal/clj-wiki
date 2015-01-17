@@ -26,7 +26,9 @@
       [:div#navbar {:class "navbar-collapse collapse"}
        (form-to {:class "navbar-form navbar-right"} [:get "/search"]
                 [:div.form-group
-                 [:input.form-control {:type "text" :name "q" :placeholder "Looking for something?"}]]                                
+                 [:input.form-control {:type "text" :name "q"
+                                       :placeholder "Looking for something?"
+                                       :style "margin-right: 5px"}]]
                 [:button.btn.btn-success {:type "submit"} "Search"])]]]        
     [:div {:class "container"}
      body]
